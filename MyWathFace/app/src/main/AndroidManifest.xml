@@ -29,7 +29,9 @@
                 android:name="com.google.android.wearable.watchface.preview_circular"
                 android:resource="@drawable/preview_analog"/>
 
-            
+            <meta-data
+                android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
+                android:value="org.gdgkobe.mywatchface.watchface.CONFIG_COMPLICATION_SIMPLE"/>
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService"/>
