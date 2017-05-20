@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">LivedoorWeatherProvider</string>
     <string name="provider_name">プロバイダー</string>
+    <string name="provider_name_weather">今日の天気</string>
 </resources>
