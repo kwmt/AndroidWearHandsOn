@@ -1,10 +1,19 @@
 package net.kwmt27.livedoorweatherprovider;
 
-import android.app.Service;
+import android.support.wearable.complications.ComplicationData;
+import android.support.wearable.complications.ComplicationManager;
+import android.support.wearable.complications.ComplicationProviderService;
+import android.support.wearable.complications.ComplicationText;
 
-/**
- * Created by kwmt on 2017/05/20.
- */
 
-public class WeatherProviderService extends Service {
+public class WeatherProviderService extends ComplicationProviderService {
+    @Override
+    public void onComplicationUpdate(int complicationId, int dataType, ComplicationManager complicationManager) {
+        ComplicationData complicationData = new ComplicationData.Builder(dataType)
+                .setShortText(ComplicationText.plainText("test"))
+                .build();
+
+        complicationManager.updateComplicationData(complicationId, complicationData);
+    }
+
 }
