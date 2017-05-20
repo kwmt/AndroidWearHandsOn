@@ -34,4 +34,4 @@ build:
     - script:
         name: run gradle assembleDevelopDebug
         code: |
-          ./LivedoorWeatherProvider/gradlew assembleDebug
+          ./LivedoorWeatherProvider/gradlew LivedoorWeatherProvider/assembleDebug
