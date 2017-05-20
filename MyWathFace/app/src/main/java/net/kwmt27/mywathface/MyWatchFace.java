@@ -28,13 +28,18 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.util.SparseArrayCompat;
 import android.support.v7.graphics.Palette;
+import android.support.wearable.complications.ComplicationData;
+import android.support.wearable.complications.ComplicationText;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
+import android.text.TextUtils;
 import android.view.SurfaceHolder;
 import android.widget.Toast;
 
@@ -49,6 +54,14 @@ import java.util.concurrent.TimeUnit;
  * mode. The watch face is drawn with less contrast in mute mode.
  */
 public class MyWatchFace extends CanvasWatchFaceService {
+
+    private SparseArrayCompat<ComplicationData> mActiveComplicationData = new SparseArrayCompat<>();
+    private static final int LEFT_DIAL_COMPLICATION = 0;
+    private Paint mComplicationPaint;
+    public static final int[] COMPLICATION_IDS = {LEFT_DIAL_COMPLICATION};
+    public static final int[][] COMPLICATION_SUPPORTED_TYPES = {
+            {ComplicationData.TYPE_SHORT_TEXT},
+    };
 
     /*
      * Update rate in milliseconds for interactive mode. We update once a second to advance the
@@ -189,6 +202,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             });
 
             mCalendar = Calendar.getInstance();
+            initializeComplication();
         }
 
         @Override
@@ -363,6 +377,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 canvas.drawBitmap(mBackgroundBitmap, 0, 0, mBackgroundPaint);
             }
 
+            drawComplications(canvas, now);
+
             /*
              * Draw ticks. Usually you will want to bake this directly into the photo, but in
              * cases where you want to allow users to select their own photos, this dynamically
@@ -512,6 +528,51 @@ public class MyWatchFace extends CanvasWatchFaceService {
                         - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
+        }
+
+        private void initializeComplication() {
+            mComplicationPaint = new Paint();
+            mComplicationPaint.setColor(Color.WHITE);
+            mComplicationPaint.setTextSize(14);
+            mComplicationPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            mComplicationPaint.setAntiAlias(true);
+            setActiveComplications(COMPLICATION_IDS);
+        }
+
+        private void drawComplications(Canvas canvas, long currentTimeMillis) {
+            ComplicationData complicationData;
+            for (int i = 0; i < COMPLICATION_IDS.length; i++) {
+                complicationData = mActiveComplicationData.get(i);
+                if ((complicationData != null)
+                        && (complicationData.isActive(currentTimeMillis))) {
+                    if (complicationData.getType() == ComplicationData.TYPE_SHORT_TEXT
+                            || complicationData.getType() == ComplicationData.TYPE_NO_PERMISSION) {
+                        ComplicationText mainText = complicationData.getShortText();
+                        ComplicationText subText = complicationData.getShortTitle();
+                        CharSequence complicationMessage = mainText.getText(getApplicationContext(), currentTimeMillis);
+                        if (subText != null) {
+                            complicationMessage = TextUtils.concat(
+                                    complicationMessage,
+                                    " ",
+                                    subText.getText(getApplicationContext(), currentTimeMillis));
+                        }
+                        double textWidth = mComplicationPaint.measureText(
+                                complicationMessage,
+                                0, complicationMessage.length());
+                        int complicationsX = (int) (mCenterX - textWidth);
+                        canvas.drawText(complicationMessage,
+                                0, complicationMessage.length(), complicationsX,
+                                mCenterY - 50, mComplicationPaint);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onComplicationDataUpdate(
+                int complicationId, ComplicationData complicationData) {
+            mActiveComplicationData.put(complicationId, complicationData);
+            invalidate();
         }
     }
 }
