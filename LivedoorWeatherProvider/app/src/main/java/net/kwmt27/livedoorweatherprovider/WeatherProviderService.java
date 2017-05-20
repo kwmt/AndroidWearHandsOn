@@ -1,5 +1,6 @@
 package net.kwmt27.livedoorweatherprovider;
 
+import android.app.PendingIntent;
 import android.graphics.drawable.Icon;
 import android.support.wearable.complications.ComplicationData;
 import android.support.wearable.complications.ComplicationManager;
@@ -39,9 +40,13 @@ public class WeatherProviderService extends ComplicationProviderService {
                                     .build();
                             complicationManager.updateComplicationData(complicationId, complicationData);
                         } else if (dataType == ComplicationData.TYPE_SHORT_TEXT) {
+                            PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
+                                    MainActivity.createChooser(getApplicationContext(), response.body().description.text), PendingIntent.FLAG_UPDATE_CURRENT);
+
                             ComplicationData complicationData = builder
                                     .setIcon(Icon.createWithResource(getApplicationContext(),R.drawable.ic_sun))
                                     .setShortText(ComplicationText.plainText(response.body().forecasts.get(0).telop))
+                                    .setTapAction(pi)
                                     .build();
                             complicationManager.updateComplicationData(complicationId, complicationData);
 
