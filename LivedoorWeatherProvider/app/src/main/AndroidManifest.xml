@@ -13,7 +13,7 @@
             android:name=".ProviderService"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/provider_name"
-            android:permission="com.google.wearable.permission.BIND_COMPLICATION_PROVIDER">
+            android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER">
             <intent-filter>
                 <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST"/>
             </intent-filter>
@@ -24,7 +24,6 @@
             <meta-data
                 android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
                 android:value="14400"/>
-
         </service>
 
     </application>
